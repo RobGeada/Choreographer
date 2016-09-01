@@ -6,7 +6,7 @@ This tool creates an interface by which to dynamically generate Spark clusters o
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
 
 1. Your Spark master address should be as follows: `master = "spark://{}:7077".format(os.environ["SPARK_MASTER"]`
-2. The spark warehouse directory should be set as `file:///`
+2. The spark warehouse directory should be set to: `file:///`
 3. Your application launcher and it's working directory must be inside projectFolder
 4. To specify the desired output of your program, bracket the desired output with the following:
 ```
