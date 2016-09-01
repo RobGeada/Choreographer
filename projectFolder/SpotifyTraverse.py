@@ -148,113 +148,15 @@ def traverse(orig):
     else:
         return (int(dataSetSize),float(dataSetSize))
 
+#========GRAPH ANALYSIS====================
+print("Finding eccentricities...")
+artistRDD = spark.parallelize(artistList,4000)
+avePathLen = artistRDD.map(lambda x: (x[1].split(" _ _ ")[0],traverse(x[1].encode(encoding))))
+avePathLen = avePathLen.map(lambda x: (unicodedata.normalize('NFKD',x[0]).encode("ascii","ignore"),x[1][0],x[1][1]))
+avePathLen = sqlc.createDataFrame(avePathLen,["Artist","MaxPathLen","AvePathLen"])
+avePathLen = avePathLen.orderBy("AvePathLen",ascending=True)
 
-def parse(dest,mode="Reader"):
-    path = getNode(dest)
-    result = [path['nID']]
-    next = getParent(path['nID'])
-    while (next != []):
-        result.append(next['nID'])
-        next = next['parent']
-    result.reverse()
-
-    if len(result)==1:
-        print("No connection!")
-    else:
-        if mode=="Reader":
-            print("\nThe shortest path ({} clicks) is:".format(len(result)-1)) 
-            for i in result:
-                if i != result[-1]:
-                    #name = i.encode("utf8")
-                    name = i.split(" _ _ ")[0]
-                    print("{} -> ".format(name),end="")
-                else:
-                    #name = i.encode("utf8")
-                    name = i.split(" _ _ ")[0]
-                    print("{}".format(name))
-        else:
-            playlistName = result[0].split(" _ _ ")[0] + " to " + result[-1].split(" _ _ ")[0] +\
-            " ({}) : ".format(dataSetSize)
-            path = []
-            for i in result:
-                path.append(i)
-            print(path)
-            API.makePlaylist(playlistName,path)
-
-
-if 1:
-    print("Finding eccentricities...")
-    artistRDD = spark.parallelize(artistList,4000)
-    avePathLen = artistRDD.map(lambda x: (x[1].split(" _ _ ")[0],traverse(x[1].encode(encoding))))
-    avePathLen = avePathLen.map(lambda x: (unicodedata.normalize('NFKD',x[0]).encode("ascii","ignore"),x[1][0],x[1][1]))
-    avePathLen = sqlc.createDataFrame(avePathLen,["Artist","MaxPathLen","AvePathLen"])
-    avePathLen = avePathLen.orderBy("AvePathLen",ascending=True)
-    print("BEGIN DESIRED OUTPUT")
-    avePathLen.show(1000)
-    print("END DESIRED OUTPUT")
-    sys.exit()
-
-#=========UI helpers=============
-def lookupOrig():
-    content = False
-    print("Welcome to the nID lookup interface!\n")
-    while not content:
-        sqlc.registerDataFrameAsTable(artRef,"artistTable")
-        searchTerm = raw_input("Selecting Origin: Who would you like to search for? ")
-        print("Searching...")
-        searched = sqlc.sql("SELECT nID FROM artistTable WHERE name LIKE '%{}%'".format(searchTerm))
-        results = searched.take(16)
-        print("\nSearch complete! Our best guesses: ")
-        n = 0
-        for i in results:
-            print("{}: {}".format(n,i[0].encode("utf8")))
-            n+=1
-        branch = raw_input("Select nID (0-15) or search again (a): ")
-        try: 
-            branch = int(branch)
-            orig = results[branch][0]
-            content = True
-        except ValueError:
-            continue
-    return orig
-def lookupDest():
-    content=False
-    while not content:
-        sqlc.registerDataFrameAsTable(artRef,"artistTable")
-        searchTerm = raw_input("\nSelecting Destination: Who would you like to search for? ")
-        print("Searching...")
-        searched = sqlc.sql("SELECT nID FROM artistTable WHERE name LIKE '%{}%'".format(searchTerm))
-        results = searched.take(16)
-        print("\nSearch complete! Our best guesses: ")
-        n = 0
-        for i in results:
-            print("{}: {}".format(n,i[0].encode("utf8")))
-            n+=1
-        branch = raw_input("Select nID (0-15) or search again (a): ")
-        try: 
-            branch = int(branch)
-            dest = results[branch][0]
-            content = True
-        except ValueError:
-            continue 
-    return dest
-
-#=========BEGIN MAIN UI LOOP=====================
-printTitle()
-print("Setup complete!\n")
-#lookup = raw_input("To look up artists to navigate between, press enter! ")
-while 1:
-    printTitle()
-    orig = lookupOrig().encode("utf8")
-    origName = orig.split(" _ _ ")[0]
-    printTitle()
-    print("Routing from {}...".format(origName))
-    traverse(orig)
-    content = "r"
-    while content != "o":
-        dest = lookupDest().encode("utf8")
-        destName = dest.split(" _ _ ")[0]
-        parse(dest,mode="maker")
-        content = raw_input("Route again (r) or select new origin (o)? ")
-        printTitle()
-        print("Routing from {}...".format(origName))
+#=======DISPLAY RESULTS====================
+print("BEGIN DESIRED OUTPUT")
+avePathLen.show(1000)
+print("END DESIRED OUTPUT")
