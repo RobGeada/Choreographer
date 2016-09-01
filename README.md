@@ -7,4 +7,8 @@ This tool creates an interface by which to dynamically generate OpenShift cluste
 2. Edit the prereqs file as neccesary. The file contains instructions on how to properly format your prereq list.
 
 ###Usage
-The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program
+The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject program to do so, and use the following flags to set cluster specificiations.
+```
+  -w: Specify the number of worker nodes desired in your cluster
+  -l: Specify the name of the program in the projectFolder that defines your app launcher
+  -p: Specify the name of your project for OpenShift purposes
