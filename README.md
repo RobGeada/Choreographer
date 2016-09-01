@@ -16,7 +16,7 @@ print("END DESIRED OUTPUT")
 ```
 This ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
 
-For further reference, the /projectFolder/SpotifyTraverse.py code has all of the specifications above.
+For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
 ###Setup
 1. Ensure your program meets the configuration guidelines as specified above.
