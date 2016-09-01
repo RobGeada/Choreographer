@@ -3,6 +3,7 @@ import os,sys,shutil
 import string
 import random
 import time
+import datetime
 from generateDockerfile import generateDockerfile
 import healthManager as health
 
@@ -43,6 +44,7 @@ if scaleTo==None:
 
 if scaleTo > 10:
 	raw_input("It looks like you're trying to make a very large cluster. Check with your cluster admin before proceeding. ")
+	sys.exit()
 
 #======DEFINE POD NAMES=================================
 dockerName = projectName
@@ -102,6 +104,7 @@ while not health.clusterOperational(scaleTo):
 print("\n\nDeploying application...")
 os.system("oc new-app {}".format(appName))
 f=open("programLogs","w")
+f.write("Deployment began at {}".format(datetime.datetime(now)))
 f.close()
 
 #===========CLUSTER HEALTH INTERFACE===========
