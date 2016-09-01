@@ -46,11 +46,11 @@ dockerName = projectName
 projectName += "-"+random.choice(string.ascii_lowercase)+random.choice(string.ascii_lowercase)
 
 #======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
-shutil.copytree("projectFolder", "SparkDocker/projectFolder")
-os.system("cd SparkDocker;python makeClusterDocker.py")
-bashCommand = "oc new-project {};cd SparkDocker;make create".format(projectName)
+shutil.copytree("projectFolder", "sparkDocker/projectFolder")
+os.system("cd sparkDocker;python makeClusterDocker.py")
+bashCommand = "oc new-project {};cd sparkDocker;make create".format(projectName)
 os.system(bashCommand)
-shutil.rmtree("./SparkDocker/projectFolder")
+shutil.rmtree("./sparkDocker/projectFolder")
 
 #=======GET WORKER AND MASTER DEPLOYMENT NAMES==========
 p = subprocess.Popen(['oc', 'get', 'rc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
