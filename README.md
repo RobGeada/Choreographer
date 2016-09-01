@@ -14,6 +14,7 @@ print("BEGIN DESIRED OUTPUT")
 output etc...
 print("END DESIRED OUTPUT")
 ```
+This last line ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
 
 ###Setup
 1. Ensure your program meets the configuration guidelines as specified above.
