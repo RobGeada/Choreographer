@@ -1,6 +1,6 @@
 # OpenShift-Deploy
 
-This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with managing cluster health and status, and deploys your app when the cluster is ready to receive it. Once your app has finished and produced it's desired output, OpenShift-Deploy will grab the output and write it to a file, then shutdown the cluster, cleaning up after itself.
+This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with managing cluster health and status, and deploys your app when the cluster is ready to receive it. Once your app has finished and produced it's desired output, OpenShift-Deploy will grab the output and write it to the programLogs file, then shutdown the cluster, thus cleaning up after itself.
 
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
