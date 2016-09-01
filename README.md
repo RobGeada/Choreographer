@@ -1,6 +1,6 @@
 # OpenShift-Deploy
 
-This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with managing cluster health and status, and deploys your app when the cluster is ready to receive it. Once your app has finished and produced it's desired output, OpenShift-Deploy will grab the output and write it to a file, then shutdown the cluster, cleaning up after itself.
+This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with managing cluster health and status, and deploys your app when the cluster is ready to receive it. Once your app has finished and produced it's desired output, OpenShift-Deploy will grab the output and write it to the programLogs file, then shutdown the cluster, thus cleaning up after itself.
 
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
@@ -16,13 +16,17 @@ print("END DESIRED OUTPUT")
 ```
 This ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
 
-For further reference, the /projectFolder/SpotifyTraverse.py code has all of the specifications above.
+For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
 ###Setup
 1. Ensure your program meets the configuration guidelines as specified above.
 2. Fill the projectFolder directory with your app code and whatever support files it needs to run. For reference, I've included my [SpotifyTraverse](https://github.com/RobGeada/SpotifyTraverse) app.
 3. Edit the prereqs file as neccesary. The file contains instructions on how to properly format your prereq list.
 4. Use `oc login` to login to an OpenShift cluster.
+
+###Dockerfile Generation
+OpenShift-Deploy will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of Red Hat's [openshift-spark](https://github.com/redhatanalytics/openshift-spark) repo.
+
 
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject program to do so, and use the following flags to set cluster specificiations.
@@ -33,4 +37,5 @@ The aim of this project was to create an "easy button" interface for the deploym
   -h: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
-`python launchProject -w 10 -l SpotifyTraverse.py -p spottrawl
+
+`python launchProject -w 10 -l SpotifyTraverse.py -p spottrawl`
