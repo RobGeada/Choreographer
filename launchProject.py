@@ -41,6 +41,9 @@ if scaleTo==None:
 		except ValueError:
 			print "Input must be integer!"
 
+if scaleTo > 10:
+	raw_input("It looks like you're trying to make a very large cluster. Check with your cluster admin before proceeding. ")
+
 #======DEFINE POD NAMES=================================
 dockerName = projectName
 projectName += "-"+random.choice(string.ascii_lowercase)+random.choice(string.ascii_lowercase)
