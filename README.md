@@ -24,6 +24,10 @@ For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/Open
 3. Edit the prereqs file as neccesary. The file contains instructions on how to properly format your prereq list.
 4. Use `oc login` to login to an OpenShift cluster.
 
+###Dockerfile Generation
+OpenShift-Deploy will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of Red Hat's [openshift-spark](https://github.com/redhatanalytics/openshift-spark) repo.
+
+
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject program to do so, and use the following flags to set cluster specificiations.
 ```
