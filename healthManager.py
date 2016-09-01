@@ -44,14 +44,19 @@ def getPodInfo(printPods=True):
 #===========CLUSTER OPERATIONAL==================================
 #Returns true if the number of worker nodes us equivalent to the target size
 def clusterOperational(tgtSize):
-	podlist = getPodInfo(printPods=False)
+	podList = getPodInfo(printPods=False)
 
 	#parse podlist for running or creating workers
 	numOperational = 0
 	for pod in podList:
+		if "master" in pod['name'] and pod['status']=="ContainerCreating":
+			numOperational=0
 		if "worker" in pod['name'] and "deploy" not in pod['name']:
 			if pod['status']=="Running":
 				numOperational += 1
+		if pod['status']=="ContainerCreating" and pod['age']>=3:
+			print("\n")
+			os.system("oc delete pod/{}".format(pod['name']))
 
 	#display results to terminal, flush stdout for cleanliness
 	print("\rCluster Status: {} of {} worker nodes operational.".format(numOperational,tgtSize),end="")

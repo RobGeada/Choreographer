@@ -104,7 +104,7 @@ while not health.clusterOperational(scaleTo):
 print("\n\nDeploying application...")
 os.system("oc new-app {}".format(appName))
 f=open("programLogs","w")
-f.write("Deployment began at {}".format(datetime.datetime(now)))
+f.write("Deployment began at {}".format(datetime.datetime.now()))
 f.close()
 
 #===========CLUSTER HEALTH INTERFACE===========
