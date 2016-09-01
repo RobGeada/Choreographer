@@ -1,0 +1,163 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {},
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "labels": {
+                    "app": "sparkcluster",
+                    "name": "spark-master-fopx"
+                },
+                "name": "spark-master-fopx"
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "port": 7077,
+                        "protocol": "TCP",
+                        "targetPort": 7077
+                    }
+                ],
+                "selector": {
+                    "name": "spark-master-fopx"
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "labels": {
+                    "app": "sparkcluster",
+                    "name": "spark-master-fopx"
+                },
+                "name": "spark-master-fopx-webui"
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "name": "spark-master-fopx"
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "labels": {
+                    "app": "sparkcluster"
+                },
+                "name": "spark-master-fopx"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "name": "spark-master-fopx"
+                },
+                "strategy": {
+                    "rollingParams": {
+                        "timeoutSeconds": 6000
+                    },
+                    "type": "Rolling"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "spark-master-fopx"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "SPARK_MASTER_PORT",
+                                        "value": "7077"
+                                    },
+                                    {
+                                        "name": "SPARK_MASTER_WEBUI_PORT",
+                                        "value": "8080"
+                                    }
+                                ],
+                                "image": "rgeada/openshift-spark",
+                                "name": "spark-master-fopx",
+                                "ports": [
+                                    {
+                                        "containerPort": 7077,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "labels": {
+                    "app": "sparkcluster"
+                },
+                "name": "spark-worker-4laj"
+            },
+            "spec": {
+                "replicas": 3,
+                "selector": {
+                    "name": "spark-worker-4laj"
+                },
+                "strategy": {
+                    "rollingParams": {
+                        "timeoutSeconds": 6000
+                    },
+                    "type": "Rolling"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "spark-worker-4laj"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "SPARK_MASTER_ADDRESS",
+                                        "value": "spark://spark-master-fopx:7077"
+                                    }
+                                ],
+                                "image": "rgeada/openshift-spark",
+                                "name": "spark-worker-4laj"
+                            }
+                        ]
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        }
+    ]
+}
