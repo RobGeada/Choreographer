@@ -12,3 +12,5 @@ The aim of this project was to create an "easy button" interface for the deploym
   -w: Specify the number of worker nodes desired in your cluster
   -l: Specify the name of the program in the projectFolder that defines your app launcher
   -p: Specify the name of your project for OpenShift purposes
+  -h: Print this help
+```
