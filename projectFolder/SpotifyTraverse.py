@@ -51,7 +51,7 @@ def printTitle():
     print("==============Version 1.2=========================8/24/2016===============\n")
 
 #===========DATA READING=========
-dataSetSize = 138000
+dataSetSize = 1000
 print("Importing data from BackupTrawl_{}...".format(dataSetSize))
 edges = sqlc.read.parquet("{}/BackupTrawl_{}/trawlEdges.parquet".format(cwd,dataSetSize))
 verts = sqlc.read.parquet("{}/BackupTrawl_{}/trawlVerts.parquet".format(cwd,dataSetSize))
