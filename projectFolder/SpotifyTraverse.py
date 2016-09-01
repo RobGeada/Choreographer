@@ -3,10 +3,7 @@ import pyspark
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 import time
-from pyspark.sql import Row
 import os,sys
-import shutil
-import json
 import unicodedata
 
 local = False
@@ -21,34 +18,13 @@ if not local:
         .appName("SQLeleton")\
         .config("spark.sql.warehouse.dir", "file:///")\
         .getOrCreate()
-    from pyspark.sql.functions import avg
     cwd = "file:///projectFolder"
 else:
     spark = pyspark.SparkContext("local[*]")
     spark.setLogLevel("OFF")
     from pyspark.sql import SQLContext
     sqlc = SQLContext(spark)
-    from pyspark.sql import SQLContext
-    from pyspark.sql.functions import avg
     cwd = os.getcwd()
-
-#===========PROGRAM FLOW HELPERS==========
-def wait(label):
-    raw_input("waiting for user input at {}".format(label))
-
-def printTitle():
-    os.system('clear')
-    print("==========================================================================")
-    print("Welcome to")   
-    print("   _____             _   _  __         _______                 _           ")
-    print("  / ____|           | | (_)/ _|       |__   __|               | |          ")
-    print(" | (___  _ __   ___ | |_ _| |_ _   _     | |_ __ __ ___      _| | ___ _ __ ")
-    print("  \___ \| '_ \ / _ \| __| |  _| | | |    | | '__/ _` \ \ /\ / / |/ _ \ '__|")
-    print("  ____) | |_) | (_) | |_| | | | |_| |    | | | | (_| |\ V  V /| |  __/ |   ")
-    print(" |_____/| .__/ \___/ \__|_|_|  \__, |    |_|_|  \__,_| \_/\_/ |_|\___|_|   ")
-    print("        | |                     __/ |                                      ")
-    print("        |_|                    |___/                                       ")
-    print("==============Version 1.2=========================8/24/2016===============\n")
 
 #===========DATA READING=========
 dataSetSize = 1000
@@ -80,12 +56,7 @@ def getnID(vertID):
 
 def setRel(nID,B):
     nIDDict.get("nID {}".format(nID))['rel'] = B   
-
-def getRel(nID):
-    return nIDDict.get("nID {}".format(nID))['rel']   
-
-def printNode(nID):
-    print("{} is related to {}".format(nID,getRel(nID)))
+ 
 
 def setParent(nID,parent):
     nIDDict.get("nID {}".format(nID))['parent'] = parent 
@@ -93,12 +64,9 @@ def setParent(nID,parent):
 def setDist(nID,distance):
     nIDDict.get("nID {}".format(nID))['distance'] = distance 
 
-def getParent(nID):
-    return nIDDict.get("nID {}".format(nID))['parent'] 
 
 def getDist(nID):
     return nIDDict.get("nID {}".format(nID))['distance'] 
-
 
 #======DATA FORMATTING 1==============
 print("Formatting data, round 1...")
