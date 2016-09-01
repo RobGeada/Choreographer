@@ -10,12 +10,21 @@ import healthManager as health
 args = sys.argv
 projectName,launcherName,scaleTo = None,None,None
 for i,arg in enumerate(args):
+	if arg == "-h":
+		helpString = """
+	-w: Specify the number of worker nodes desired in your cluster
+	-l: Specify the name of the program in the projectFolder that defines your app launcher
+	-p: Specify the name of your project for OpenShift purposes
+		"""
+		print helpString
+		sys.exit()
 	if arg == "-p":
 		projectName = args[i+1].lower()
 	if arg == "-l":
 		launcherName= args[i+1]
 	if arg == "-w":
 		scaleTo= int(args[i+1])	
+
 
 #+=====GET USER PARAMETERS IF NO CL ARGUMENTS===========
 if projectName == None:
@@ -93,7 +102,7 @@ f.close()
 
 #===========CLUSTER HEALTH INTERFACE===========
 while not health.getLogs(dockerName):
-	time.sleep(1)
+	time.sleep(3)
 
 os.system("oc delete project/{}".format(projectName))
 print("Application has finished! View logs at {}/programLogs".format(os.getcwd()))
