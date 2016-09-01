@@ -1,2 +1,4 @@
 *.pyc
 programLogs
+Dockerfile
+sparkDocker/Dockerfile
