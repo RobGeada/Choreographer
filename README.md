@@ -14,7 +14,9 @@ print("BEGIN DESIRED OUTPUT")
 output etc...
 print("END DESIRED OUTPUT")
 ```
-This last line ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
+This ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
+
+For further reference, the /projectFolder/SpotifyTraverse.py code has all of the specifications above.
 
 ###Setup
 1. Ensure your program meets the configuration guidelines as specified above.
