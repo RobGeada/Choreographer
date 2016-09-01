@@ -33,4 +33,5 @@ The aim of this project was to create an "easy button" interface for the deploym
   -h: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
+
 `python launchProject -w 10 -l SpotifyTraverse.py -p spottrawl`
