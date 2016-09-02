@@ -31,11 +31,14 @@ OpenShift-Deploy will generate Dockerfiles for the worker, master, and driver no
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program to do so, and use the following flags to set cluster specificiations.
 ```
-  -w: Specify the number of worker nodes desired in your cluster
-  -l: Specify the name of the program in the projectFolder that defines your app launcher
-  -p: Specify the name of your project for OpenShift purposes
-  -h: Print this help
+  -w,    --workers: Specify the number of worker nodes desired in your cluster
+	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
+	-p,    --project: Specify the name of your project for OpenShift purposes
+	-n, --newCluster: Create new cluster, rather than using existing one.
+ 	-h,       --help: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
 `python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl`
+
+It's important to remember the OpenShift-Deploy creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
