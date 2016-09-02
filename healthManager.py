@@ -78,7 +78,7 @@ def driverOperational(driverName):
 		if driverName in pod['name']:
 			if pod['status']=="ContainerCreating" and pod['age']>=3:
 				os.system("oc delete pod/{}".format(pod['name']))
-			elif driverName in pod['name'] and pod['status']=="Running":
+			elif driverName in pod['name'] and "deploy" not in pod['name'] and pod['status']=="Running":
 				return True
 	return False
 
@@ -86,21 +86,32 @@ def driverOperational(driverName):
 #Parses driver logs for specific output, saves that to log file
 #This ensures you get the desired results without creating massive files
 def getLogs(dockerName):
-	podList = getPodInfo()
+	podList = getPodInfo(printPods=False)
 
 	#get master,worker,and driver deployment configs 
-	driverName = None
+	driverName,masterName,workerName = None,None,None
+	driverUp,masterUp,numWorkers = "STALLED","STALLED",0
+
 	for pod in podList:
 		if dockerName in pod['name'] and 'deploy' not in pod['name'] and pod['status']=="Running":
+			driverUp = "RUNNING"
 			driverName = pod['name']
-		if "spark-master" in pod['name']:
+		if "spark-master" in pod['name'] and pod['status']=="Running":
+			masterUp = "RUNNING"
 			masterName = pod['name'][:-8]
-		if "spark-worker" in pod['name']:
+		if "spark-worker" in pod['name'] and pod['status']=="Running":
+			numWorkers += 1
 			workerName = pod['name'][:-8]
 	
+	#display results
+	outString = "\r| Master: {} | ".format(masterUp)+\
+				"Driver: {} | ".format(driverUp)+\
+				"Workers: {} | ".format(numWorkers)+\
+				"Results..."
+	print(outString,end="")
+
 	#if the driver is running, get the logs
 	if driverName != None:
-		print("\nRetrieving results...",end="")
 		p = subprocess.Popen(['oc', 'logs','{}'.format(driverName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		out, err = p.communicate()
 		
@@ -116,11 +127,12 @@ def getLogs(dockerName):
 			f.close()
 
 			#shuttdown cluster upon success
-			print("COMPLETED")
+			print("FOUND |            ",end="")
 			os.system("oc delete dc/{}".format(dockerName))
 			os.system("oc delete dc/{}".format(masterName))
 			os.system("oc delete dc/{}".format(workerName))
 			return True
 		else:
-			print("NOT FOUND (YET)")
+			print("NOT YET FOUND |      ",end="")
+	sys.stdout.flush()
 	return False

@@ -27,7 +27,7 @@ else:
     cwd = os.getcwd()
 
 #===========DATA READING=========
-dataSetSize = 1000
+dataSetSize = 138000
 print("Importing data from BackupTrawl_{}...".format(dataSetSize))
 edges = sqlc.read.parquet("{}/BackupTrawl_{}/trawlEdges.parquet".format(cwd,dataSetSize))
 verts = sqlc.read.parquet("{}/BackupTrawl_{}/trawlVerts.parquet".format(cwd,dataSetSize))

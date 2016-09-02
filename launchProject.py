@@ -84,12 +84,11 @@ os.system("docker build -t {} .".format(appName))
 os.system("docker push {}".format(appName))
 
 
-#==============CLUSTER MANAGEMENT===============
+#==============CLUSTER READINESS CHECKS===============
 os.system('clear')
 print("Beginning Cluster Management Interface...\n")
 
 #wait for initial cluster to ready-up
-
 print("Waiting for initial cluster deployment to become ready...")
 while not health.clusterOperational(3):
 	time.sleep(1)
@@ -102,9 +101,8 @@ clusterTgt = scaleTo
 while not health.clusterOperational(clusterTgt):
 	time.sleep(1)
 	tries+=1
-	print tries
 	if tries > 100:
-		print("Desired cluster size cannot initialize, lowering target...")
+		print(" Desired cluster size cannot initialize, lowering target...")
 		clusterTgt-=1
 		os.system("oc scale --replicas={} rc {}".format(clusterTgt,workerName))
 
@@ -122,7 +120,9 @@ f=open("programLogs","w")
 f.write("Deployment began at {}".format(datetime.datetime.now()))
 f.close()
 
-#===========CLUSTER HEALTH INTERFACE===========
+#===========DRIVER RESULTS OBSERVATION===========
+os.system("clear")
+print("Beginning driver pod observation at {}...\n".format(datetime.datetime.now()))
 while not health.getLogs(dockerName):
 	time.sleep(1)
 
