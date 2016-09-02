@@ -1,4 +1,4 @@
-#Generated 2016-09-01 15:01:37.695392
+#Generated 2016-09-02 10:56:16.164549
 #This generated Dockerfile is based off of Matthew Farrellee's openshift-spark Dockerfile
 
 FROM centos:latest
@@ -34,7 +34,7 @@ COPY ./projectFolder /projectFolder
 RUN chmod -R +rx /projectFolder
 USER 185
 
-ENV SPARK_MASTER=spark-master-a2o1 \ 
+ENV SPARK_MASTER=spark-master-rw03 \ 
     SPARK_USER=test \ 
     PYTHONIOENCODIG=utf_8 \ 
     LAUNCH_PROGRAM=SpotifyTraverse.py

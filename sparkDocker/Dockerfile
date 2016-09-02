@@ -1,4 +1,4 @@
-#Generated 2016-09-01 15:01:21.455551
+#Generated 2016-09-02 10:55:59.628730
 #This generated Dockerfile is based off of Matthew Farrellee's openshift-spark Dockerfile
 
 FROM centos:latest

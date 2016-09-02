@@ -4,6 +4,7 @@ import string
 import random
 import time
 import datetime
+
 from generateDockerfile import generateDockerfile
 import healthManager as health
 
@@ -88,28 +89,42 @@ os.system('clear')
 print("Beginning Cluster Management Interface...\n")
 
 #wait for initial cluster to ready-up
+
 print("Waiting for initial cluster deployment to become ready...")
 while not health.clusterOperational(3):
 	time.sleep(1)
-	continue
 
 #scale cluster and wait for completion
 print "\n\nScaling cluster to desired size..."
 os.system("oc scale --replicas={} rc {}".format(scaleTo,workerName))
-while not health.clusterOperational(scaleTo):
+tries = 0
+clusterTgt = scaleTo
+while not health.clusterOperational(clusterTgt):
 	time.sleep(1)
-	continue
+	tries+=1
+	print tries
+	if tries > 100:
+		print("Desired cluster size cannot initialize, lowering target...")
+		clusterTgt-=1
+		os.system("oc scale --replicas={} rc {}".format(clusterTgt,workerName))
 
 #deploy application, clear program logs
 print("\n\nDeploying application...")
 os.system("oc new-app {}".format(appName))
+
+#wait for driver to become ready
+print("\n\nWaiting on driver pod to become ready...")
+while not health.driverOperational(dockerName):
+	time.sleep(1)
+
+#format logs for data retrieval
 f=open("programLogs","w")
 f.write("Deployment began at {}".format(datetime.datetime.now()))
 f.close()
 
 #===========CLUSTER HEALTH INTERFACE===========
 while not health.getLogs(dockerName):
-	time.sleep(3)
+	time.sleep(1)
 
 os.system("oc delete project/{}".format(projectName))
 print("Application has finished! View logs at {}/programLogs".format(os.getcwd()))

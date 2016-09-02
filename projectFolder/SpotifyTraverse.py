@@ -27,7 +27,7 @@ else:
     cwd = os.getcwd()
 
 #===========DATA READING=========
-dataSetSize = 19000
+dataSetSize = 1000
 print("Importing data from BackupTrawl_{}...".format(dataSetSize))
 edges = sqlc.read.parquet("{}/BackupTrawl_{}/trawlEdges.parquet".format(cwd,dataSetSize))
 verts = sqlc.read.parquet("{}/BackupTrawl_{}/trawlVerts.parquet".format(cwd,dataSetSize))
@@ -118,7 +118,7 @@ def traverse(orig):
 
 #========GRAPH ANALYSIS====================
 print("Finding eccentricities...")
-artistRDD = spark.parallelize(artistList,4000)
+artistRDD = spark.parallelize(artistList,800)
 avePathLen = artistRDD.map(lambda x: (x[1].split(" _ _ ")[0],traverse(x[1].encode(encoding))))
 avePathLen = avePathLen.map(lambda x: (unicodedata.normalize('NFKD',x[0]).encode("ascii","ignore"),x[1][0],x[1][1]))
 avePathLen = sqlc.createDataFrame(avePathLen,["Artist","MaxPathLen","AvePathLen"])

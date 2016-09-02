@@ -42,21 +42,22 @@ def getPodInfo(printPods=True):
 	return podList 
 
 #===========CLUSTER OPERATIONAL==================================
-#Returns true if the number of worker nodes us equivalent to the target size
+#Returns true if the number of worker nodes us equivalent to the target size, and master is running
 def clusterOperational(tgtSize):
 	podList = getPodInfo(printPods=False)
 
 	#parse podlist for running or creating workers
 	numOperational = 0
 	for pod in podList:
+		if pod['status']=="ContainerCreating" and pod['age']>=1:
+			print("\n")
+			os.system("oc delete pod/{}".format(pod['name']))		
 		if "master" in pod['name'] and pod['status']=="ContainerCreating":
 			numOperational=0
-		if "worker" in pod['name'] and "deploy" not in pod['name']:
+			break
+		elif "worker" in pod['name'] and "deploy" not in pod['name']:
 			if pod['status']=="Running":
 				numOperational += 1
-		if pod['status']=="ContainerCreating" and pod['age']>=3:
-			print("\n")
-			os.system("oc delete pod/{}".format(pod['name']))
 
 	#display results to terminal, flush stdout for cleanliness
 	print("\rCluster Status: {} of {} worker nodes operational.".format(numOperational,tgtSize),end="")
@@ -67,6 +68,19 @@ def clusterOperational(tgtSize):
 		return True
 	else:
 		return False
+
+#===========DRIVER OPERATIONAL==================================
+#Returns true if the driver pod is running
+def driverOperational(driverName):
+	podList = getPodInfo(printPods=False)
+	#parse podlist for driver
+	for pod in podList:
+		if driverName in pod['name']:
+			if pod['status']=="ContainerCreating" and pod['age']>=3:
+				os.system("oc delete pod/{}".format(pod['name']))
+			elif driverName in pod['name'] and pod['status']=="Running":
+				return True
+	return False
 
 #===========GET LODS==================================
 #Parses driver logs for specific output, saves that to log file
