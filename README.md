@@ -8,13 +8,12 @@ In order for the OpenShift nodes to properly communicate with your PySpark app, 
 1. Your Spark master address should be as follows: `master = "spark://{}:7077".format(os.environ["SPARK_MASTER"]`
 2. The spark warehouse directory should be set to: `file:///`
 3. Your application launcher and its working directory must be inside projectFolder
-4. To specify the desired output of your program, bracket the desired output with the following:
+4. To specify the desired output of your program, include the following:
 ```
-print("BEGIN DESIRED OUTPUT")
-output etc...
-print("END DESIRED OUTPUT")
+print program output etc...
+print("DESIRED OUTPUT LENGTH: 1000")
 ```
-This ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
+This will extract the previous 1000 lines of log output and write them to your local disk.
 
 For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
