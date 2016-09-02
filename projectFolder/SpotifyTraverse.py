@@ -11,11 +11,11 @@ local = False
 if not local:
     master = os.environ["SPARK_MASTER"]
     master = "spark://{}:7077".format(master)
-    conf = SparkConf().setAppName("SQLeleton").setMaster(master)
+    conf = SparkConf().setAppName("SpotTrawl").setMaster(master)
     spark = SparkContext(conf=conf)
     sqlc = SparkSession.builder\
         .master(master)\
-        .appName("SQLeleton")\
+        .appName("SpotTrawl")\
         .config("spark.sql.warehouse.dir", "file:///")\
         .getOrCreate()
     cwd = "file:///projectFolder"
@@ -27,7 +27,7 @@ else:
     cwd = os.getcwd()
 
 #===========DATA READING=========
-dataSetSize = 138000
+dataSetSize = 1000
 print("Importing data from BackupTrawl_{}...".format(dataSetSize))
 edges = sqlc.read.parquet("{}/BackupTrawl_{}/trawlEdges.parquet".format(cwd,dataSetSize))
 verts = sqlc.read.parquet("{}/BackupTrawl_{}/trawlVerts.parquet".format(cwd,dataSetSize))

@@ -10,24 +10,26 @@ import healthManager as health
 
 #======PARSE COMMAND LINE ARGUMENTS====================
 args = sys.argv
-projectName,launcherName,scaleTo = None,None,None
+projectName,launcherName,scaleTo,newCluster = None,None,None,False
 for i,arg in enumerate(args):
-	if arg == "-h":
+	if arg == "-h"  or arg == "--help":
 		helpString = """
-	-w: Specify the number of worker nodes desired in your cluster
-	-l: Specify the name of the program in the projectFolder that defines your app launcher
-	-p: Specify the name of your project for OpenShift purposes
-	-h: Print this help
+	-w,    --workers: Specify the number of worker nodes desired in your cluster
+	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
+	-p,    --project: Specify the name of your project for OpenShift purposes
+	-n, --newCluster: Create new cluster. rather than use existing one.
+ 	-h,       --help: Print this help
 		"""
 		print helpString
 		sys.exit()
-	if arg == "-p":
+	if arg == "-p" or arg == "--project":
 		projectName = args[i+1].lower()
-	if arg == "-l":
+	if arg == "-l"  or arg == "--launcher":
 		launcherName= args[i+1]
-	if arg == "-w":
-		scaleTo= int(args[i+1])	
-
+	if arg == "-w"  or arg == "--workers":
+		scaleTo= int(args[i+1])
+	if arg == "-n"  or arg == "--newCluster":
+		newCluster = True
 
 #+=====GET USER PARAMETERS IF NO CL ARGUMENTS===========
 if projectName == None:
@@ -51,80 +53,108 @@ if scaleTo > 10:
 dockerName = projectName
 projectName += "-"+random.choice(string.ascii_lowercase)+random.choice(string.ascii_lowercase)
 
-#======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
-shutil.copytree("projectFolder", "sparkDocker/projectFolder")
-os.system("cd sparkDocker;python makeClusterDocker.py")
-bashCommand = "oc new-project {};cd sparkDocker;make create".format(projectName)
-os.system(bashCommand)
-shutil.rmtree("./sparkDocker/projectFolder")
+def deployCluster():
+	#======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
+	shutil.copytree("projectFolder", "sparkDocker/projectFolder")
+	os.system("cd sparkDocker;python makeClusterDocker.py")
+	bashCommand = "oc new-project {};cd sparkDocker;make create".format(projectName)
+	os.system(bashCommand)
+	shutil.rmtree("./sparkDocker/projectFolder")
 
-#=======GET WORKER AND MASTER DEPLOYMENT NAMES==========
-p = subprocess.Popen(['oc', 'get', 'rc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-out, err = p.communicate()
-masterName = None
+	#=======GET WORKER AND MASTER DEPLOYMENT NAMES==========
+	masterName,workerName,driverName = health.getDCInfo()
 
-#determine master and worker names
-for word in out.split():
-	if "spark-master" in word:
-		#save master name for use with driver application
-		masterName = word[:-2]
-	if "spark-worker" in word: 
-		workerName = word
+	#==============BUILD DRIVER ==========================
+	buildNewDriver(masterName)
 
-#==============GENERATE DRIVER DOCKERFILE===============
-if masterName!=None:
-	generateDockerfile(masterName,launcherName)
-else:
-	print "No master node detected!"
-	sys.exit()
+	#==============CLUSTER READINESS CHECKS===============
+	os.system('clear')
+	print("Beginning Cluster Management Interface...\n")
 
-#==============CREATE DRIVER IMAGE===============
-appName = "rgeada/{}".format(dockerName)
-os.system("docker build -t {} .".format(appName))
-os.system("docker push {}".format(appName))
+	#wait for initial cluster to ready-up
+	print("Waiting for initial cluster deployment to become ready...")
+	while not health.clusterOperational(3):
+		time.sleep(1)
+
+	#scale cluster and wait for completion
+	print "\n\nScaling cluster to desired size..."
+	os.system("oc scale --replicas={} rc {}".format(scaleTo,workerName))
+	tries = 0
+	clusterTgt = scaleTo
+	while not health.clusterOperational(clusterTgt):
+		time.sleep(1)
+		tries+=1
+		if tries > 100:
+			print(" Desired cluster size cannot initialize, lowering target...")
+			clusterTgt-=1
+			os.system("oc scale --replicas={} rc {}".format(clusterTgt,workerName))
 
 
-#==============CLUSTER READINESS CHECKS===============
-os.system('clear')
-print("Beginning Cluster Management Interface...\n")
+#=============DEPLOY DRIVER PODS==========================
+def deployApp():
+	#=======BUILD DRIVER IMAGE==========
+	masterName,workerName,driverName = health.getDCInfo()
+	appName = buildNewDriver(masterName)
 
-#wait for initial cluster to ready-up
-print("Waiting for initial cluster deployment to become ready...")
-while not health.clusterOperational(3):
-	time.sleep(1)
+	#==============DEPLOY DRIVER IMAGE===============
+	if driverName == None:
+		print("\n\nDeploying application...")
+		os.system("oc new-app {}".format(appName))
+	else:
+		health.deleteDriver()
+		print("\nRedeploying new application...\n")
+		os.system("oc new-app {}".format(appName))
 
-#scale cluster and wait for completion
-print "\n\nScaling cluster to desired size..."
-os.system("oc scale --replicas={} rc {}".format(scaleTo,workerName))
-tries = 0
-clusterTgt = scaleTo
-while not health.clusterOperational(clusterTgt):
-	time.sleep(1)
-	tries+=1
-	if tries > 100:
-		print(" Desired cluster size cannot initialize, lowering target...")
-		clusterTgt-=1
-		os.system("oc scale --replicas={} rc {}".format(clusterTgt,workerName))
+	#wait for driver to become ready
+	print("\n\nWaiting on driver pod to become ready...")
+	while not health.driverOperational(dockerName):
+		time.sleep(1)
 
-#deploy application, clear program logs
-print("\n\nDeploying application...")
-os.system("oc new-app {}".format(appName))
+	#format logs for data retrieval
+	f=open("programLogs","w")
+	f.write("Deployment began at {}".format(datetime.datetime.now()))
+	f.close()
 
-#wait for driver to become ready
-print("\n\nWaiting on driver pod to become ready...")
-while not health.driverOperational(dockerName):
-	time.sleep(1)
+	#===========DRIVER RESULTS OBSERVATION===========
+	os.system("clear")
+	print("Beginning driver pod observation at {}...\n".format(datetime.datetime.now()))
+	while not health.getLogs(dockerName):
+		time.sleep(1)
 
-#format logs for data retrieval
-f=open("programLogs","w")
-f.write("Deployment began at {}".format(datetime.datetime.now()))
-f.close()
+	#===========CLEANUP=======================	
+	print("\nApplication has finished! View logs at {}/programLogs".format(os.getcwd()))
+	choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))
+	print("\n")
+	if choice == "r":
+		health.cleanUp("Driver")
+		print("\nDriver has been removed. Using OpenShift-Deploy again will result in the deployment of a new driver.")
+	else:
+		health.cleanUp("All")
+		print("\nCluster has been removed. Using OpenShift-Deploy again will result in the creation of a new cluster.")
 
-#===========DRIVER RESULTS OBSERVATION===========
-os.system("clear")
-print("Beginning driver pod observation at {}...\n".format(datetime.datetime.now()))
-while not health.getLogs(dockerName):
-	time.sleep(1)
+#============CREATE NEW DRIVER IMAGE==================
+def buildNewDriver(masterName):
+	#generate new docker image
+	if masterName!=None:
+		generateDockerfile(masterName,launcherName)
+	else:
+		print "No master node detected!"
+		sys.exit()
 
-os.system("oc delete project/{}".format(projectName))
-print("Application has finished! View logs at {}/programLogs".format(os.getcwd()))
+	#build and push driver image
+	appName = "rgeada/{}".format(dockerName)
+	os.system("docker build -t {} .".format(appName))
+	os.system("docker push {}".format(appName))
+	return appName
+
+#==============MAIN===============
+if newCluster:
+	deployCluster()
+	deployApp()
+else:	
+	masterName = health.getDCInfo()[0]
+	if masterName==None:
+		deployCluster()
+		deployApp()
+	else:
+		deployApp()

@@ -41,6 +41,34 @@ def getPodInfo(printPods=True):
 
 	return podList 
 
+#===========GET DC INFO==================================
+#Returns the names of the master and worker deployment configs
+def getDCInfo():
+	p = subprocess.Popen(['oc', 'get', 'rc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	out, err = p.communicate()
+	masterName,workerName,driverName = None,None,None
+
+	rawDCList = out.split()
+	dcList = []
+
+	for i,info in enumerate(rawDCList):
+		if (i%4 != 0):
+			continue
+		elif info=="NAME":
+			continue
+		else:
+			dcList.append(rawDCList[i])
+
+	#determine master and worker names
+	for word in dcList:
+		if "spark-master" in word:
+			masterName = word[:-2]
+		elif "spark-worker" in word: 
+			workerName = word
+		else:
+			driverName = word[:-2]
+	return (masterName,workerName,driverName)
+
 #===========CLUSTER OPERATIONAL==================================
 #Returns true if the number of worker nodes us equivalent to the target size, and master is running
 def clusterOperational(tgtSize):
@@ -82,7 +110,7 @@ def driverOperational(driverName):
 				return True
 	return False
 
-#===========GET LODS==================================
+#===========GET LOGS==================================
 #Parses driver logs for specific output, saves that to log file
 #This ensures you get the desired results without creating massive files
 def getLogs(dockerName):
@@ -104,7 +132,7 @@ def getLogs(dockerName):
 			workerName = pod['name'][:-8]
 	
 	#display results
-	outString = "\r| Master: {} | ".format(masterUp)+\
+	outString = "\rMaster: {} | ".format(masterUp)+\
 				"Driver: {} | ".format(driverUp)+\
 				"Workers: {} | ".format(numWorkers)+\
 				"Results..."
@@ -127,12 +155,28 @@ def getLogs(dockerName):
 			f.close()
 
 			#shuttdown cluster upon success
-			print("FOUND |            ",end="")
-			os.system("oc delete dc/{}".format(dockerName))
-			os.system("oc delete dc/{}".format(masterName))
-			os.system("oc delete dc/{}".format(workerName))
+			print("FOUND |            \n\n",end="")
+			sys.stdout.flush()
 			return True
 		else:
 			print("NOT YET FOUND |      ",end="")
 	sys.stdout.flush()
 	return False
+
+#===========DELETE DRIVER==================================
+#cleans up any remnants of old drivers
+#allows new drivers to be depolyed to old clusters
+def deleteDriver():
+	driver = getDCInfo()[2]
+	if driver!=None:
+		os.system("oc delete dc/{}".format(driver))
+		os.system("oc delete is/{}".format(driver))
+
+#===========CLEAN UP==================================
+#cleans up the project to various levels of 'clean'
+def cleanUp(level="All"):
+	masterName,workerName,driverName = getDCInfo()
+	if level=="All":
+		os.system("oc delete project/$(oc project -q)")
+	elif level=="Driver":
+		deleteDriver()
