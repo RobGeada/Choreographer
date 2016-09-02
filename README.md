@@ -24,7 +24,7 @@ For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/Open
 4. Use `oc login` to login to an OpenShift cluster.
 
 ###Dockerfile Generation
-OpenShift-Deploy will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics's [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
+Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics's [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
 
 
 ###Usage
