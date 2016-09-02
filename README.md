@@ -1,6 +1,6 @@
-# OpenShift-Deploy
+# Choreographer
 
-This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with cluster creation, managing cluster health and status, and application deployment when the cluster is ready. Once your app has finished and produced its desired output, OpenShift-Deploy will grab the output, write it to the programLogs file, and then shutdown the cluster, thus cleaning up after itself.
+This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with cluster creation, managing cluster health and status, and application deployment when the cluster is ready. Once your app has finished and produced its desired output, Choreographer will grab the output, write it to the programLogs file, and then shutdown the cluster, thus cleaning up after itself.
 
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
@@ -40,4 +40,4 @@ So to deploy the example SpotifyTraverse application included with this repo, us
 
 `python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl`
 
-It's important to remember the OpenShift-Deploy creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
+It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
