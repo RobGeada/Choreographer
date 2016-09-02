@@ -7,7 +7,7 @@ In order for the OpenShift nodes to properly communicate with your PySpark app, 
 
 1. Your Spark master address should be as follows: `master = "spark://{}:7077".format(os.environ["SPARK_MASTER"]`
 2. The spark warehouse directory should be set to: `file:///`
-3. Your application launcher and it's working directory must be inside projectFolder
+3. Your application launcher and its working directory must be inside projectFolder
 4. To specify the desired output of your program, bracket the desired output with the following:
 ```
 print("BEGIN DESIRED OUTPUT")
