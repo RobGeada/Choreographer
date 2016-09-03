@@ -27,7 +27,7 @@ else:
     cwd = os.getcwd()
 
 #===========DATA READING=========
-dataSetSize = 1000
+dataSetSize = 35000
 print("Importing data from BackupTrawl_{}...".format(dataSetSize))
 edges = sqlc.read.parquet("{}/BackupTrawl_{}/trawlEdges.parquet".format(cwd,dataSetSize))
 verts = sqlc.read.parquet("{}/BackupTrawl_{}/trawlVerts.parquet".format(cwd,dataSetSize))
@@ -125,6 +125,7 @@ avePathLen = sqlc.createDataFrame(avePathLen,["Artist","MaxPathLen","AvePathLen"
 avePathLen = avePathLen.orderBy("AvePathLen",ascending=True)
 
 #=======DISPLAY RESULTS====================
-print("BEGIN DESIRED OUTPUT")
 avePathLen.show(1000)
-print("END DESIRED OUTPUT")
+print("DESIRED OUTPUT LENGTH: 1006")
+#give time for results to be saved
+time.sleep(1000)

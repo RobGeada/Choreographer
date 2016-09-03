@@ -118,7 +118,7 @@ def getLogs(dockerName):
 
 	#get master,worker,and driver deployment configs 
 	driverName,masterName,workerName = None,None,None
-	driverUp,masterUp,numWorkers = "STALLED","STALLED",0
+	driverUp,masterUp,numWorkers = "STOPPED","STOPPED",0
 
 	for pod in podList:
 		if dockerName in pod['name'] and 'deploy' not in pod['name'] and pod['status']=="Running":
@@ -135,7 +135,7 @@ def getLogs(dockerName):
 	outString = "\rMaster: {} | ".format(masterUp)+\
 				"Driver: {} | ".format(driverUp)+\
 				"Workers: {} | ".format(numWorkers)+\
-				"Results..."
+				"Results: "
 	print(outString,end="")
 
 	#if the driver is running, get the logs
@@ -144,22 +144,41 @@ def getLogs(dockerName):
 		out, err = p.communicate()
 		
 		#find desired output in log file
-		tgtOutStart = out.find("BEGIN DESIRED OUTPUT")
-		tgtOutEnd = out.find("END DESIRED OUTPUT")
+		tgtOutEnd= out.find("DESIRED OUTPUT LENGTH: ")
+		haveResults = out.rfind("INFO TaskSetManager: Finished task")
+		
+		#keep track of progress
+		if haveResults != -1:
+			lastFinished = out[out.rfind("INFO TaskSetManager: Finished task"):]
+			lastFinished = lastFinished[:lastFinished.find("\n")]
+			progress = lastFinished[lastFinished.rfind("(")+1:-1]
+			spacer = ' '*(8-len(progress))
+		else:
+			progress = "NONE    "
+			spacer = ""
 
 		#if the desired output is found, extract and write it
-		if tgtOutStart != -1 and tgtOutEnd != -1:
+		if tgtOutEnd != -1:
+			print("FOUND   |            \n\n",end="")
+			sys.stdout.flush()
+
+			#get the log lines
+			outLines = out.splitlines()
+			for i,line in enumerate(outLines):
+				if "DESIRED OUTPUT LENGTH" in line:
+        				lenToKeep = int(line.split(": ")[1])
+        				keep = outLines[i-lenToKeep:i]
+        				break
+
+        	#write the log lines
 			f = open("programLogs","a")
 			f.write("\n\n=============LOGS RETRIEVED AT {}=============\n\n".format(datetime.datetime.now()))
-			f.write(out[tgtOutStart:tgtOutEnd+18])
+			for line in keep:
+				f.write("{}\n".format(line))
 			f.close()
-
-			#shuttdown cluster upon success
-			print("FOUND |            \n\n",end="")
-			sys.stdout.flush()
 			return True
 		else:
-			print("NOT YET FOUND |      ",end="")
+			print("{}{} | ".format(progress,spacer),end="")
 	sys.stdout.flush()
 	return False
 

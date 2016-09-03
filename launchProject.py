@@ -17,7 +17,7 @@ for i,arg in enumerate(args):
 	-w,    --workers: Specify the number of worker nodes desired in your cluster
 	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
 	-p,    --project: Specify the name of your project for OpenShift purposes
-	-n, --newCluster: Create new cluster. rather than use existing one.
+	-n, --newCluster: Create new cluster, rather than use existing one.
  	-h,       --help: Print this help
 		"""
 		print helpString
@@ -119,7 +119,7 @@ def deployApp():
 	os.system("clear")
 	print("Beginning driver pod observation at {}...\n".format(datetime.datetime.now()))
 	while not health.getLogs(dockerName):
-		time.sleep(1)
+		time.sleep(5)
 
 	#===========CLEANUP=======================	
 	print("\nApplication has finished! View logs at {}/programLogs".format(os.getcwd()))
@@ -127,10 +127,10 @@ def deployApp():
 	print("\n")
 	if choice == "r":
 		health.cleanUp("Driver")
-		print("\nDriver has been removed. Using OpenShift-Deploy again will result in the deployment of a new driver.")
+		print("\nDriver has been removed. Using Choreographer again will result in the deployment of a new driver.")
 	else:
 		health.cleanUp("All")
-		print("\nCluster has been removed. Using OpenShift-Deploy again will result in the creation of a new cluster.")
+		print("\nCluster has been removed. Using Choreographer again will result in the creation of a new cluster.")
 
 #============CREATE NEW DRIVER IMAGE==================
 def buildNewDriver(masterName):

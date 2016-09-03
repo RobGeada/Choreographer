@@ -9,9 +9,9 @@
             "metadata": {
                 "labels": {
                     "app": "sparkcluster",
-                    "name": "spark-master-an2i"
+                    "name": "spark-master-am4p"
                 },
-                "name": "spark-master-an2i"
+                "name": "spark-master-am4p"
             },
             "spec": {
                 "ports": [
@@ -22,7 +22,7 @@
                     }
                 ],
                 "selector": {
-                    "name": "spark-master-an2i"
+                    "name": "spark-master-am4p"
                 }
             }
         },
@@ -32,9 +32,9 @@
             "metadata": {
                 "labels": {
                     "app": "sparkcluster",
-                    "name": "spark-master-an2i"
+                    "name": "spark-master-am4p"
                 },
-                "name": "spark-master-an2i-webui"
+                "name": "spark-master-am4p-webui"
             },
             "spec": {
                 "ports": [
@@ -45,7 +45,7 @@
                     }
                 ],
                 "selector": {
-                    "name": "spark-master-an2i"
+                    "name": "spark-master-am4p"
                 }
             }
         },
@@ -56,12 +56,12 @@
                 "labels": {
                     "app": "sparkcluster"
                 },
-                "name": "spark-master-an2i"
+                "name": "spark-master-am4p"
             },
             "spec": {
                 "replicas": 1,
                 "selector": {
-                    "name": "spark-master-an2i"
+                    "name": "spark-master-am4p"
                 },
                 "strategy": {
                     "rollingParams": {
@@ -72,7 +72,7 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "spark-master-an2i"
+                            "name": "spark-master-am4p"
                         }
                     },
                     "spec": {
@@ -89,7 +89,7 @@
                                     }
                                 ],
                                 "image": "rgeada/openshift-spark",
-                                "name": "spark-master-an2i",
+                                "name": "spark-master-am4p",
                                 "ports": [
                                     {
                                         "containerPort": 7077,
@@ -118,12 +118,12 @@
                 "labels": {
                     "app": "sparkcluster"
                 },
-                "name": "spark-worker-qebk"
+                "name": "spark-worker-acn5"
             },
             "spec": {
                 "replicas": 3,
                 "selector": {
-                    "name": "spark-worker-qebk"
+                    "name": "spark-worker-acn5"
                 },
                 "strategy": {
                     "rollingParams": {
@@ -134,7 +134,7 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "spark-worker-qebk"
+                            "name": "spark-worker-acn5"
                         }
                     },
                     "spec": {
@@ -143,11 +143,11 @@
                                 "env": [
                                     {
                                         "name": "SPARK_MASTER_ADDRESS",
-                                        "value": "spark://spark-master-an2i:7077"
+                                        "value": "spark://spark-master-am4p:7077"
                                     }
                                 ],
                                 "image": "rgeada/openshift-spark",
-                                "name": "spark-worker-qebk"
+                                "name": "spark-worker-acn5"
                             }
                         ]
                     }
