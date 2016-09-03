@@ -1,6 +1,6 @@
-# OpenShift-Deploy
+# Choreographer
 
-This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with cluster creation, managing cluster health and status, and application deployment when the cluster is ready. Once your app has finished and produced its desired output, OpenShift-Deploy will grab the output, write it to the programLogs file, and then shutdown the cluster, thus cleaning up after itself.
+This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with cluster creation, managing cluster health and status, and application deployment when the cluster is ready. Once your app has finished and produced its desired output, Choreographer will grab the output, write it to the programLogs file, and then shutdown the cluster, thus cleaning up after itself.
 
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
@@ -8,13 +8,12 @@ In order for the OpenShift nodes to properly communicate with your PySpark app, 
 1. Your Spark master address should be as follows: `master = "spark://{}:7077".format(os.environ["SPARK_MASTER"]`
 2. The spark warehouse directory should be set to: `file:///`
 3. Your application launcher and its working directory must be inside projectFolder
-4. To specify the desired output of your program, bracket the desired output with the following:
+4. To specify the desired output of your program, include the following:
 ```
-print("BEGIN DESIRED OUTPUT")
-output etc...
-print("END DESIRED OUTPUT")
+print program output etc...
+print("DESIRED OUTPUT LENGTH: 1000")
 ```
-This ensures that the program can correctly extract the right info from the driver pod logs, without filling up the program log files with pages and pages of Spark logs.
+This will extract the previous 1000 lines of log output and write them to your local disk.
 
 For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
@@ -25,17 +24,20 @@ For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/Open
 4. Use `oc login` to login to an OpenShift cluster.
 
 ###Dockerfile Generation
-OpenShift-Deploy will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics's [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
+Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics's [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
 
 
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program to do so, and use the following flags to set cluster specificiations.
 ```
-  -w: Specify the number of worker nodes desired in your cluster
-  -l: Specify the name of the program in the projectFolder that defines your app launcher
-  -p: Specify the name of your project for OpenShift purposes
-  -h: Print this help
+    -w,    --workers: Specify the number of worker nodes desired in your cluster
+	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
+	-p,    --project: Specify the name of your project for OpenShift purposes
+	-n, --newCluster: Create new cluster, rather than using existing one.
+ 	-h,       --help: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
 `python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl`
+
+It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
