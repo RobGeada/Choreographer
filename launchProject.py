@@ -7,7 +7,13 @@ import datetime
 
 from generateDockerfile import generateDockerfile
 import healthManager as health
-from notifyMe import notifyMe
+
+try:
+	from notifyMe import notifyMe
+	notifyMeEnabled = True
+except ImportError:
+	notifyMeEnabled = False
+	pass
 
 #======PARSE COMMAND LINE ARGUMENTS====================
 args = sys.argv
@@ -135,9 +141,10 @@ def deployApp():
 
 	#===========CLEANUP=======================	
 	print("\nApplication has finished! View logs at {}/programLogs".format(os.getcwd()))
-	notifyMe("Deployment has finished!","{}/programLogs".format(os.getcwd()))
-	choice = "d"
-	#choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))
+	if notifyMeEnabled:
+		notifyMe("Deployment has finished!","{}/programLogs".format(os.getcwd()))
+	#choice = "d"
+	choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))
 	print("\n")
 	if choice == "r":
 		health.cleanUp("Driver")
