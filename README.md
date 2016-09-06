@@ -30,11 +30,13 @@ Choreographer will generate Dockerfiles for the worker, master, and driver nodes
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program to do so, and use the following flags to set cluster specificiations.
 ```
-    -w,    --workers: Specify the number of worker nodes desired in your cluster
-	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-p,    --project: Specify the name of your project for OpenShift purposes
-	-n, --newCluster: Create new cluster, rather than using existing one.
- 	-h,       --help: Print this help
+    -w,     --workers: Specify the number of worker nodes desired in your cluster
+	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
+	-p,     --project: Specify the name of your project for OpenShift purposes
+	-d,  --dockerName: Specify your Docker Hub username
+	-o, --clusterCred: Specify your cluster credentials (username:pass)
+	-n,  --newCluster: Create new cluster, rather than use existing one.
+ 	-h,        --help: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
