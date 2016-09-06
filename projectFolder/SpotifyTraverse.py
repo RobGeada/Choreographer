@@ -8,7 +8,14 @@ import unicodedata
 
 local = False
 
-if not local:
+if local:
+    spark = pyspark.SparkContext("local[*]")
+    spark.setLogLevel("OFF")
+    from pyspark.sql import SQLContext
+    sqlc = SQLContext(spark)
+    cwd = os.getcwd()
+    dataSetSize = 1000
+else:
     master = os.environ["SPARK_MASTER"]
     master = "spark://{}:7077".format(master)
     conf = SparkConf().setAppName("SpotTrawl").setMaster(master)
@@ -19,15 +26,10 @@ if not local:
         .config("spark.sql.warehouse.dir", "file:///")\
         .getOrCreate()
     cwd = "file:///projectFolder"
-else:
-    spark = pyspark.SparkContext("local[*]")
-    spark.setLogLevel("OFF")
-    from pyspark.sql import SQLContext
-    sqlc = SQLContext(spark)
-    cwd = os.getcwd()
+    dataSetSize = 138000
+
 
 #===========DATA READING=========
-dataSetSize = 35000
 print("Importing data from BackupTrawl_{}...".format(dataSetSize))
 edges = sqlc.read.parquet("{}/BackupTrawl_{}/trawlEdges.parquet".format(cwd,dataSetSize))
 verts = sqlc.read.parquet("{}/BackupTrawl_{}/trawlVerts.parquet".format(cwd,dataSetSize))
@@ -97,6 +99,7 @@ def traverse(orig):
     getNode(Q[0])['distance']=0
     runningSum = 0.0
     maxDist = 0
+    maxArtist=""
     numNodes = 0.0
     while Q:
         current = getNode(Q[0])
@@ -109,20 +112,21 @@ def traverse(orig):
                 numNodes+=1
                 runningSum+=distTo
                 if distTo > maxDist:
+                    maxArtist = current['nID']
                     maxDist = distTo
                 Q.append(i)
-    if numNodes>=int(dataSetSize):
-        return (int(maxDist),float(runningSum/numNodes))
+    if numNodes>0:
+        return (int(maxDist),maxArtist,float(runningSum/numNodes))
     else:
-        return (int(dataSetSize),float(dataSetSize))
+        return (None,None,float(dataSetSize))
 
 #========GRAPH ANALYSIS====================
 print("Finding eccentricities...")
 artistRDD = spark.parallelize(artistList,800)
 avePathLen = artistRDD.map(lambda x: (x[1].split(" _ _ ")[0],traverse(x[1].encode(encoding))))
-avePathLen = avePathLen.map(lambda x: (unicodedata.normalize('NFKD',x[0]).encode("ascii","ignore"),x[1][0],x[1][1]))
-avePathLen = sqlc.createDataFrame(avePathLen,["Artist","MaxPathLen","AvePathLen"])
-avePathLen = avePathLen.orderBy("AvePathLen",ascending=True)
+avePathLen = avePathLen.map(lambda x: (unicodedata.normalize('NFKD',x[0]).encode("ascii","ignore"),x[1][0],x[1][1],x[1][2]))
+avePathLen = sqlc.createDataFrame(avePathLen,["Artist","MaxPathLen","MaxArtist","AvePathLen"])
+avePathLen = avePathLen.orderBy("MaxPathLen",ascending=False)
 
 #=======DISPLAY RESULTS====================
 avePathLen.show(1000)

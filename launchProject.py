@@ -7,6 +7,7 @@ import datetime
 
 from generateDockerfile import generateDockerfile
 import healthManager as health
+from notifyMe import notifyMe
 
 #======PARSE COMMAND LINE ARGUMENTS====================
 args = sys.argv
@@ -14,16 +15,22 @@ projectName,launcherName,scaleTo,newCluster = None,None,None,False
 for i,arg in enumerate(args):
 	if arg == "-h"  or arg == "--help":
 		helpString = """
-	-w,    --workers: Specify the number of worker nodes desired in your cluster
-	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-p,    --project: Specify the name of your project for OpenShift purposes
-	-n, --newCluster: Create new cluster, rather than use existing one.
- 	-h,       --help: Print this help
+	-w,     --workers: Specify the number of worker nodes desired in your cluster
+	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
+	-p,     --project: Specify the name of your project for OpenShift purposes
+	-d,  --dockerName: Specify your Docker Hub username
+	-o, --clusterCred: Specify your cluster credentials (username:pass)
+	-n,  --newCluster: Create new cluster, rather than use existing one.
+ 	-h,        --help: Print this help
 		"""
 		print helpString
 		sys.exit()
 	if arg == "-p" or arg == "--project":
 		projectName = args[i+1].lower()
+	if arg == "-d" or arg == "--dockerName":
+		dockerUsername = args[i+1]
+	if arg == "-o" or arg == "--clusterCred":
+		clusterUser,clusterPass = args[i+1].split(":")
 	if arg == "-l"  or arg == "--launcher":
 		launcherName= args[i+1]
 	if arg == "-w"  or arg == "--workers":
@@ -118,12 +125,19 @@ def deployApp():
 	#===========DRIVER RESULTS OBSERVATION===========
 	os.system("clear")
 	print("Beginning driver pod observation at {}...\n".format(datetime.datetime.now()))
+	tries = 0
 	while not health.getLogs(dockerName):
+		tries+=1
 		time.sleep(5)
+		if tries > 3600:
+			os.system("oc login -u {} -p {}".format(clusterUser,clusterPass))
+			tries = 0
 
 	#===========CLEANUP=======================	
 	print("\nApplication has finished! View logs at {}/programLogs".format(os.getcwd()))
-	choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))
+	notifyMe("Deployment has finished!","{}/programLogs".format(os.getcwd()))
+	choice = "d"
+	#choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))
 	print("\n")
 	if choice == "r":
 		health.cleanUp("Driver")
@@ -142,7 +156,7 @@ def buildNewDriver(masterName):
 		sys.exit()
 
 	#build and push driver image
-	appName = "rgeada/{}".format(dockerName)
+	appName = "{}/{}".format(dockerUser,dockerName)
 	os.system("docker build -t {} .".format(appName))
 	os.system("docker push {}".format(appName))
 	return appName
