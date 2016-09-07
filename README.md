@@ -2,6 +2,12 @@
 
 This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with cluster creation, managing cluster health and status, and application deployment when the cluster is ready. Once your app has finished and produced its desired output, Choreographer will grab the output, write it to the programLogs file, and then shutdown the cluster, thus cleaning up after itself.
 
+###Prequisites
+* Docker version 1.9.1
+* Python 2.7
+
+That's it!
+
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
 
