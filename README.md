@@ -5,6 +5,7 @@ This tool creates an interface by which to dynamically generate Spark clusters o
 ###Prequisites
 * Docker version 1.9.1
 * Python 2.7
+* [OpenShift Origin](https://github.com/openshift/origin/releases/tag/v1.3.0-alpha.3)
 
 That's it!
 
