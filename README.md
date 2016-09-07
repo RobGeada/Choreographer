@@ -47,6 +47,6 @@ The aim of this project was to create an "easy button" interface for the deploym
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
-`python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl -d dockerName -o developer:developer'`
+`python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl -d dockerName -o developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
