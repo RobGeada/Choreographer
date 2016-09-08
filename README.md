@@ -2,6 +2,13 @@
 
 This tool creates an interface by which to dynamically generate Spark clusters on OpenShift for deployment of PySpark applications. The interface deals with cluster creation, managing cluster health and status, and application deployment when the cluster is ready. Once your app has finished and produced its desired output, Choreographer will grab the output, write it to the programLogs file, and then shutdown the cluster, thus cleaning up after itself.
 
+###Prequisites
+* Docker version 1.9.1
+* Python 2.7
+* [OpenShift Origin](https://github.com/openshift/origin/releases/tag/v1.3.0-alpha.3)
+
+That's it!
+
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
 
@@ -24,20 +31,22 @@ For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/Open
 4. Use `oc login` to login to an OpenShift cluster.
 
 ###Dockerfile Generation
-Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics's [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
+Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics' [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
 
 
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program to do so, and use the following flags to set cluster specificiations.
 ```
-    -w,    --workers: Specify the number of worker nodes desired in your cluster
-	-l,   --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-p,    --project: Specify the name of your project for OpenShift purposes
-	-n, --newCluster: Create new cluster, rather than using existing one.
- 	-h,       --help: Print this help
+    -w,     --workers: Specify the number of worker nodes desired in your cluster
+	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
+	-p,     --project: Specify the name of your project for OpenShift purposes
+	-d,  --dockerName: Specify your Docker Hub username
+	-o, --clusterCred: Specify your cluster credentials (username:pass)
+	-n,  --newCluster: Create new cluster, rather than use existing one.
+ 	-h,        --help: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
-`python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl`
+`python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl -d dockerName -o developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
