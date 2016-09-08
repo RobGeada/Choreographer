@@ -19,8 +19,9 @@ In order for the OpenShift nodes to properly communicate with your PySpark app, 
 ```
 print program output etc...
 print("DESIRED OUTPUT LENGTH: 1000")
+time.sleep(500)
 ```
-This will extract the previous 1000 lines of log output and write them to your local disk.
+This will extract the previous 1000 lines of log output and write them to your local disk. Additionally, I recommend including a sleep counter after the desired input; this ensures that your driver pod will remain running for a bit after output generation, thus ensuring that Choreographer has time to grab the results. 
 
 For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
