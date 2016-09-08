@@ -58,8 +58,10 @@ if scaleTo==None:
 		except ValueError:
 			print "Input must be integer!"
 
-if scaleTo > 10:
-	raw_input("It looks like you're trying to make a very large cluster. Check with your cluster admin before proceeding. ")
+
+#===========GET A SENSE OF CLUSTER RESOURCE LIMITS==========
+if scaleTo > 20:
+	raw_input("It looks like you're trying to make a large cluster. Check with your cluster admin before proceeding. ")
 	sys.exit()
 
 #======DEFINE POD NAMES=================================
@@ -70,6 +72,9 @@ def deployCluster():
 	#======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
 	shutil.copytree("projectFolder", "sparkDocker/projectFolder")
 	os.system("cd sparkDocker;python makeClusterDocker.py")
+	os.system("oc login -u {} -p {}".format(clusterUser,clusterPass))
+	os.environ["CHOREO_PROJECT"]=dockerName
+	os.environ["DOCKER_USER"]=dockerUser
 	bashCommand = "oc new-project {};cd sparkDocker;make create".format(projectName)
 	os.system(bashCommand)
 	shutil.rmtree("./sparkDocker/projectFolder")

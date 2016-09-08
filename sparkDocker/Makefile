@@ -1,4 +1,4 @@
-SPARK_IMAGE=rgeada/openshift-spark
+SPARK_IMAGE=$(DOCKER_USER)/openshift-spark-$(CHOREO_PROJECT)
 
 .PHONY: build clean push create destroy
 
@@ -9,7 +9,7 @@ clean:
 	docker rmi openshift-spark
 
 push: build
-	docker tag -f openshift-spark $(SPARK_IMAGE)
+	docker tag -f $openshift-spark $(SPARK_IMAGE)
 	docker push $(SPARK_IMAGE)
 
 create: push template.yaml
