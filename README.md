@@ -19,8 +19,9 @@ In order for the OpenShift nodes to properly communicate with your PySpark app, 
 ```
 print program output etc...
 print("DESIRED OUTPUT LENGTH: 1000")
+time.sleep(500)
 ```
-This will extract the previous 1000 lines of log output and write them to your local disk.
+This will extract the previous 1000 lines of log output and write them to your local disk. Additionally, I recommend including a sleep counter after the desired input; this ensures that your driver pod will remain running for a bit after output generation, thus ensuring that Choreographer has time to grab the results. 
 
 For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
@@ -39,14 +40,13 @@ The aim of this project was to create an "easy button" interface for the deploym
 ```
     -w,     --workers: Specify the number of worker nodes desired in your cluster
 	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-p,     --project: Specify the name of your project for OpenShift purposes
 	-d,  --dockerName: Specify your Docker Hub username
-	-o, --clusterCred: Specify your cluster credentials (username:pass)
+	-c, --clusterCred: Specify your cluster credentials (username:pass)
 	-n,  --newCluster: Create new cluster, rather than use existing one.
  	-h,        --help: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
-`python launchProject.py -w 10 -l SpotifyTraverse.py -p spottrawl -d dockerName -o developer:developer`
+`python launchProject.py -w 10 -l SpotifyTraverse.py -d dockerName -o developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
