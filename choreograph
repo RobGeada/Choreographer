@@ -72,10 +72,10 @@ if scaleTo > 20:
 #======DEFINE POD NAMES=================================
 dockerName = projectName
 projectName += "-"+random.choice(string.ascii_lowercase)+random.choice(string.ascii_lowercase)
+choreoHome = sys.argv[0][:-12]
 
 def deployCluster():
 	#======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
-	choreoHome = sys.argv[0][:-12]
 	shutil.copytree("app", "{}/sparkDocker/app".format(choreoHome))
 	os.system("cd {}/sparkDocker;python makeClusterDocker.py".format(choreoHome))
 	os.system("oc login -u {} -p {}".format(clusterUser,clusterPass))
@@ -169,8 +169,10 @@ def deployApp():
 #============CREATE NEW DRIVER IMAGE==================
 def buildNewDriver(masterName):
 	#generate new docker image
+	shutil.copytree("app", "{}/app".format(choreoHome))
+	os.system("cd {}".format(choreoHome))
 	if masterName!=None:
-		generateDockerfile(masterName,launcherName,os.getcwd())
+		generateDockerfile(masterName,launcherName)
 	else:
 		print "No master node detected!"
 		sys.exit()
@@ -179,6 +181,7 @@ def buildNewDriver(masterName):
 	appName = "{}/{}".format(dockerUsername,dockerName)
 	os.system("docker build -t {}:latest .".format(appName))
 	os.system("docker push {}".format(appName))
+	shutil.rmtree("{}/app".format(choreoHome))
 	return appName
 
 #==============MAIN===============

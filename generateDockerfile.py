@@ -1,13 +1,14 @@
-import datetime,os
+import datetime,os,sys
 
 '''
 Based on the contents of the prereqs file in the projectFolder, this will
 generate a Dockerfile to serve as the driver pod in OpenShift deployment.
 '''
 
-def generateDockerfile(masterName,launchProgram,cwd):
+def generateDockerfile(masterName,launchProgram):
+	os.chdir(sys.path[0])
 	prereqPackages = []
-	with open("{}/app/prereqs".format(cwd)) as f:
+	with open("app/prereqs") as f:
 		for line in f:
 			prereqPackages.append(line)
 
@@ -62,10 +63,8 @@ USER root
 RUN rm -rf /tmp/scripts
 
 # Switch to the user 185 for OpenShift usage
-RUN mkdir app"""
-	dockerTemplate+="\nCOPY {}/app /app".format(cwd)
-	dockerTemplate+="""
-RUN chmod -R +rx /projectFolder
+COPY ./app /app
+RUN chmod -R +rx /app
 USER 185
 """
 # Start the main process"""
@@ -81,4 +80,4 @@ USER 185
 	f.close()
 
 if __name__ == "__main__":
-	generateDockerfile("test","test.py",os.getcwd())
+	generateDockerfile("test","test.py")
