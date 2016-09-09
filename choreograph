@@ -73,6 +73,7 @@ if scaleTo > 20:
 dockerName = projectName
 projectName += "-"+random.choice(string.ascii_lowercase)+random.choice(string.ascii_lowercase)
 choreoHome = sys.argv[0][:-12]
+projectHome= os.getcwd()
 
 def deployCluster():
 	#======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
@@ -169,8 +170,7 @@ def deployApp():
 #============CREATE NEW DRIVER IMAGE==================
 def buildNewDriver(masterName):
 	#generate new docker image
-	shutil.copytree("app", "{}/app".format(choreoHome))
-	os.system("cd {}".format(choreoHome))
+	shutil.copytree("{}/app".format(projectHome), "{}/app".format(choreoHome))
 	if masterName!=None:
 		generateDockerfile(masterName,launcherName)
 	else:
