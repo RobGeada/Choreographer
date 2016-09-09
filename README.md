@@ -34,10 +34,10 @@ chmod +x choreograph
 export PATH=$PATH:$(pwd)
 ```
 ###Setup
-1. Ensure your program meets the configuration guidelines as specified above.
-2. Fill the projectFolder directory with your app code and whatever support files it needs to run. For reference, I've included my [SpotifyTraverse](https://github.com/RobGeada/SpotifyTraverse) app.
-3. Edit the prereqs file as neccesary. The file contains instructions on how to properly format your prereq list.
-4. Use `oc login` to login to an OpenShift cluster.
+1. Ensure your Spark app meets the configuration guidelines as specified above.
+2. Create a project directory for your Spark application. 
+3. Create a directory named "app" within the project directory. This should contain your app code and all necessary datasets.
+3. Edit the prereqs file within the app folder as neccesary. The file contains instructions on how to properly format your prereq list.
 
 ###Dockerfile Generation
 Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics' [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
