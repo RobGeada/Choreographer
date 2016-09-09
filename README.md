@@ -47,15 +47,14 @@ Choreographer will generate Dockerfiles for the worker, master, and driver nodes
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program to do so, and use the following flags to set cluster specificiations.
 ```
-    -w,     --workers: Specify the number of worker nodes desired in your cluster
-	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-d,  --dockerName: Specify your Docker Hub username
-	-c, --clusterCred: Specify your cluster credentials (username:pass)
-	-n,  --newCluster: Create new cluster, rather than use existing one.
- 	-h,        --help: Print this help
+	-w,     --workers: Specify the number of worker nodes desired in your cluster
+	    -l,    --launcher: Specify the name of the program in the app that defines your app launcher
+	    -c, --clusterCred: Specify your cluster credentials (username:pass)
+	    -n,  --newCluster: Create new cluster, rather than use existing one.
+	    -h,        --help: Print this help\n"""
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
-`python launchProject.py -w 10 -l SpotifyTraverse.py -d dockerName -o developer:developer`
+`choreograph -w 10 -l SpotifyTraverse.py -o developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
