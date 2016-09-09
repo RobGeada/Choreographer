@@ -26,7 +26,7 @@ This will extract the previous 1000 lines of log output and write them to your l
 For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
 ###Installation
-Run 
+Run the following in your install directory of choice:
 ```
 git clone https://github.com/RobGeada/Choreographer.git
 cd Choreographer
