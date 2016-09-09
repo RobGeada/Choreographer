@@ -144,7 +144,7 @@ def deployApp():
 	os.system("clear")
 	print("Beginning driver pod observation at {}...\n".format(datetime.datetime.now()))
 	tries = 0
-	while not health.getLogs(dockerName):
+	while not health.getLogs(dockerName,projectHome):
 		tries+=1
 		time.sleep(5)
 		if tries > 3600:
@@ -152,10 +152,10 @@ def deployApp():
 			tries = 0
 
 	#===========CLEANUP=======================	
-	print("\nApplication has finished! View logs at {}/programLogs".format(os.getcwd()))
+	print("\nApplication has finished! View logs at {}/programLogs".format(projectHome))
 	'''
 	if notifyMeEnabled:
-		notifyMe("Deployment has finished!","{}/programLogs".format(os.getcwd()))
+		notifyMe("Deployment has finished!","{}/programLogs".format(projectHome))
 	'''
 	#choice = "d"
 	choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))

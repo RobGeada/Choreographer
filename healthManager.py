@@ -113,7 +113,7 @@ def driverOperational(driverName):
 #===========GET LOGS==================================
 #Parses driver logs for specific output, saves that to log file
 #This ensures you get the desired results without creating massive files
-def getLogs(dockerName):
+def getLogs(dockerName,projectHome):
 	podList = getPodInfo(printPods=False)
 
 	#get master,worker,and driver deployment configs 
@@ -171,7 +171,7 @@ def getLogs(dockerName):
         				break
 
         	#write the log lines
-			f = open("programLogs","a")
+			f = open("{}/programLogs".format(projectHome),"a")
 			f.write("\n\n=============LOGS RETRIEVED AT {}=============\n\n".format(datetime.datetime.now()))
 			for line in keep:
 				f.write("{}\n".format(line))
