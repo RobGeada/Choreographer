@@ -9,6 +9,15 @@ This tool creates an interface by which to dynamically generate Spark clusters o
 
 That's it!
 
+###Installation
+Run the following in your install directory of choice:
+```
+git clone https://github.com/RobGeada/Choreographer.git
+cd Choreographer
+chmod +x choreograph 
+export PATH=$PATH:$(pwd)
+```
+
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
 
@@ -26,10 +35,10 @@ This will extract the previous 1000 lines of log output and write them to your l
 For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
 
 ###Setup
-1. Ensure your program meets the configuration guidelines as specified above.
-2. Fill the projectFolder directory with your app code and whatever support files it needs to run. For reference, I've included my [SpotifyTraverse](https://github.com/RobGeada/SpotifyTraverse) app.
-3. Edit the prereqs file as neccesary. The file contains instructions on how to properly format your prereq list.
-4. Use `oc login` to login to an OpenShift cluster.
+1. Ensure your Spark app meets the configuration guidelines as specified above.
+2. Create a project directory for your Spark application. 
+3. Create a directory named "app" within the project directory. This should contain your app code and all necessary datasets.
+3. Edit the prereqs file within the app folder as neccesary. The file contains instructions on how to properly format your prereq list.
 
 ###Dockerfile Generation
 Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics' [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
@@ -38,15 +47,14 @@ Choreographer will generate Dockerfiles for the worker, master, and driver nodes
 ###Usage
 The aim of this project was to create an "easy button" interface for the deployment of PySpark apps. As such, a cluster can be created, an application deployed, and results collected all from a single command. Use the launchProject.py program to do so, and use the following flags to set cluster specificiations.
 ```
-    -w,     --workers: Specify the number of worker nodes desired in your cluster
-	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-d,  --dockerName: Specify your Docker Hub username
-	-c, --clusterCred: Specify your cluster credentials (username:pass)
-	-n,  --newCluster: Create new cluster, rather than use existing one.
- 	-h,        --help: Print this help
+        -w,     --workers: Specify the number of worker nodes desired in your cluster
+	    -l,    --launcher: Specify the name of the program in the app that defines your app launcher
+	    -c, --clusterCred: Specify your cluster credentials (username:pass)
+	    -n,  --newCluster: Create new cluster, rather than use existing one.
+	    -h,        --help: Print this help
 ```
 So to deploy the example SpotifyTraverse application included with this repo, use the following command:
 
-`python launchProject.py -w 10 -l SpotifyTraverse.py -d dockerName -o developer:developer`
+`choreograph -w 10 -l SpotifyTraverse.py -o developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
