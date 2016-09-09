@@ -12,4 +12,4 @@ export NSS_WRAPPER_GROUP=/etc/group
 export LD_PRELOAD=libnss_wrapper.so
 
 echo Submitting to Spark...
-exec $SPARK_HOME/bin/spark-submit /projectFolder/$LAUNCH_PROGRAM
+exec $SPARK_HOME/bin/spark-submit /app/$LAUNCH_PROGRAM
