@@ -41,7 +41,7 @@ The aim of this project was to create an "easy button" interface for the deploym
     -w,     --workers: Specify the number of worker nodes desired in your cluster
 	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
 	-d,  --dockerName: Specify your Docker Hub username
-	-o, --clusterCred: Specify your cluster credentials (username:pass)
+	-c, --clusterCred: Specify your cluster credentials (username:pass)
 	-n,  --newCluster: Create new cluster, rather than use existing one.
  	-h,        --help: Print this help
 ```
