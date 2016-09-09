@@ -9,7 +9,7 @@ clean:
 	docker rmi openshift-spark
 
 push: build
-	docker tag -f $openshift-spark $(SPARK_IMAGE)
+	docker tag -f openshift-spark $(SPARK_IMAGE)
 	docker push $(SPARK_IMAGE)
 
 create: push template.yaml

@@ -9,9 +9,9 @@
             "metadata": {
                 "labels": {
                     "app": "sparkcluster",
-                    "name": "spark-master-spry"
+                    "name": "spark-master-2nse"
                 },
-                "name": "spark-master-spry"
+                "name": "spark-master-2nse"
             },
             "spec": {
                 "ports": [
@@ -22,7 +22,7 @@
                     }
                 ],
                 "selector": {
-                    "name": "spark-master-spry"
+                    "name": "spark-master-2nse"
                 }
             }
         },
@@ -32,9 +32,9 @@
             "metadata": {
                 "labels": {
                     "app": "sparkcluster",
-                    "name": "spark-master-spry"
+                    "name": "spark-master-2nse"
                 },
-                "name": "spark-master-spry-webui"
+                "name": "spark-master-2nse-webui"
             },
             "spec": {
                 "ports": [
@@ -45,7 +45,7 @@
                     }
                 ],
                 "selector": {
-                    "name": "spark-master-spry"
+                    "name": "spark-master-2nse"
                 }
             }
         },
@@ -56,12 +56,12 @@
                 "labels": {
                     "app": "sparkcluster"
                 },
-                "name": "spark-master-spry"
+                "name": "spark-master-2nse"
             },
             "spec": {
                 "replicas": 1,
                 "selector": {
-                    "name": "spark-master-spry"
+                    "name": "spark-master-2nse"
                 },
                 "strategy": {
                     "rollingParams": {
@@ -72,7 +72,7 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "spark-master-spry"
+                            "name": "spark-master-2nse"
                         }
                     },
                     "spec": {
@@ -88,8 +88,8 @@
                                         "value": "8080"
                                     }
                                 ],
-                                "image": "rgeada/openshift-spark",
-                                "name": "spark-master-spry",
+                                "image": "rgeada/openshift-spark-spotifytraverse",
+                                "name": "spark-master-2nse",
                                 "ports": [
                                     {
                                         "containerPort": 7077,
@@ -118,12 +118,12 @@
                 "labels": {
                     "app": "sparkcluster"
                 },
-                "name": "spark-worker-g46k"
+                "name": "spark-worker-xtxe"
             },
             "spec": {
                 "replicas": 3,
                 "selector": {
-                    "name": "spark-worker-g46k"
+                    "name": "spark-worker-xtxe"
                 },
                 "strategy": {
                     "rollingParams": {
@@ -134,7 +134,7 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "spark-worker-g46k"
+                            "name": "spark-worker-xtxe"
                         }
                     },
                     "spec": {
@@ -143,11 +143,11 @@
                                 "env": [
                                     {
                                         "name": "SPARK_MASTER_ADDRESS",
-                                        "value": "spark://spark-master-spry:7077"
+                                        "value": "spark://spark-master-2nse:7077"
                                     }
                                 ],
-                                "image": "rgeada/openshift-spark",
-                                "name": "spark-worker-g46k"
+                                "image": "rgeada/openshift-spark-spotifytraverse",
+                                "name": "spark-worker-xtxe"
                             }
                         ]
                     }

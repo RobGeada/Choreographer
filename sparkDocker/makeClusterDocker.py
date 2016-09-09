@@ -6,7 +6,7 @@ generate a Dockerfile to serve as the worker and master pod in OpenShift deploym
 '''
 
 prereqPackages = []
-with open("./projectFolder/prereqs") as f:
+with open("./app/prereqs") as f:
 	for line in f:
 		prereqPackages.append(line)
 
@@ -61,9 +61,9 @@ RUN [ "bash", "-x", "/tmp/scripts/spark/install" ]
 USER root
 RUN rm -rf /tmp/scripts
 
-RUN mkdir /projectFolder
-COPY ./projectFolder /projectFolder
-RUN chmod -R +rx /projectFolder
+RUN mkdir /app
+COPY ./app /app
+RUN chmod -R +rx /app
 
 # Switch to the user 185 for OpenShift usage
 USER 185

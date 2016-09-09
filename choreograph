@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import subprocess
 import os,sys,shutil
 import string
@@ -7,34 +9,27 @@ import datetime
 
 from generateDockerfile import generateDockerfile
 import healthManager as health
-
+'''
 try:
 	from notifyMe import notifyMe
 	notifyMeEnabled = True
 except ImportError:
 	notifyMeEnabled = False
 	pass
-
+'''
 #======PARSE COMMAND LINE ARGUMENTS====================
 args = sys.argv
-projectName,launcherName,scaleTo,newCluster = None,None,None,False
+projectName,dockerUsername,launcherName,scaleTo,newCluster = None,None,None,None,False
 for i,arg in enumerate(args):
-	if arg == "-h"  or arg == "--help":
-		helpString = """
-	-w,     --workers: Specify the number of worker nodes desired in your cluster
-	-l,    --launcher: Specify the name of the program in the projectFolder that defines your app launcher
-	-p,     --project: Specify the name of your project for OpenShift purposes
-	-d,  --dockerName: Specify your Docker Hub username
-	-o, --clusterCred: Specify your cluster credentials (username:pass)
-	-n,  --newCluster: Create new cluster, rather than use existing one.
- 	-h,        --help: Print this help
-		"""
-		print helpString
+	if arg == "-h" or arg == "--help":
+		print """
+	    -w,     --workers: Specify the number of worker nodes desired in your cluster
+	    -l,    --launcher: Specify the name of the program in the app that defines your app launcher
+	    -c, --clusterCred: Specify your cluster credentials (username:pass)
+	    -n,  --newCluster: Create new cluster, rather than use existing one.
+	    -h,        --help: Print this help\n"""
 		sys.exit()
-	if arg == "-p" or arg == "--project":
-		projectName = args[i+1].lower()
-	if arg == "-d" or arg == "--dockerName":
-		dockerUsername = args[i+1]
+
 	if arg == "-o" or arg == "--clusterCred":
 		clusterUser,clusterPass = args[i+1].split(":")
 	if arg == "-l"  or arg == "--launcher":
@@ -45,10 +40,10 @@ for i,arg in enumerate(args):
 		newCluster = True
 
 #+=====GET USER PARAMETERS IF NO CL ARGUMENTS===========
-if projectName == None:
-	projectName = raw_input("Set project name: ").lower()
 if launcherName== None:
-	launcherName = raw_input("Set program name: ")
+	launcherName = raw_input("What is the launcher program name? ")
+if clusterUser== None:
+	clusterUser,clusterPass = raw_input("What is your cluster login info? (name:pass) ").split(":")
 if scaleTo==None:
 	valid = False
 	while not valid:
@@ -57,6 +52,16 @@ if scaleTo==None:
 			valid = True
 		except ValueError:
 			print "Input must be integer!"
+
+#get docker hub username
+p = subprocess.Popen(['docker','info'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+dInfo, err = p.communicate()
+dInfo = dInfo.split()
+for i,value in enumerate(dInfo):
+	if value == "Username:":
+		dockerUsername = dInfo[i+1]
+
+projectName = launcherName.split(".py")[0].lower()
 
 
 #===========GET A SENSE OF CLUSTER RESOURCE LIMITS==========
@@ -70,14 +75,15 @@ projectName += "-"+random.choice(string.ascii_lowercase)+random.choice(string.as
 
 def deployCluster():
 	#======CREATE PROJECT, WORKER/DRIVER DOCKERFILES,INITIAL CLUSTER==================
-	shutil.copytree("projectFolder", "sparkDocker/projectFolder")
-	os.system("cd sparkDocker;python makeClusterDocker.py")
+	choreoHome = sys.argv[0][:-12]
+	shutil.copytree("app", "{}/sparkDocker/app".format(choreoHome))
+	os.system("cd {}/sparkDocker;python makeClusterDocker.py".format(choreoHome))
 	os.system("oc login -u {} -p {}".format(clusterUser,clusterPass))
 	os.environ["CHOREO_PROJECT"]=dockerName
-	os.environ["DOCKER_USER"]=dockerUser
-	bashCommand = "oc new-project {};cd sparkDocker;make create".format(projectName)
+	os.environ["DOCKER_USER"]=dockerUsername
+	bashCommand = "oc new-project {};cd {}/sparkDocker;make create".format(projectName,choreoHome)
 	os.system(bashCommand)
-	shutil.rmtree("./sparkDocker/projectFolder")
+	shutil.rmtree("{}/sparkDocker/app".format(choreoHome))
 
 	#=======GET WORKER AND MASTER DEPLOYMENT NAMES==========
 	masterName,workerName,driverName = health.getDCInfo()
@@ -146,8 +152,10 @@ def deployApp():
 
 	#===========CLEANUP=======================	
 	print("\nApplication has finished! View logs at {}/programLogs".format(os.getcwd()))
+	'''
 	if notifyMeEnabled:
 		notifyMe("Deployment has finished!","{}/programLogs".format(os.getcwd()))
+	'''
 	#choice = "d"
 	choice = raw_input("Would you like to destroy the {} cluster (d) or leave it running driverless (r)? ".format(dockerName))
 	print("\n")
@@ -162,14 +170,14 @@ def deployApp():
 def buildNewDriver(masterName):
 	#generate new docker image
 	if masterName!=None:
-		generateDockerfile(masterName,launcherName)
+		generateDockerfile(masterName,launcherName,os.getcwd())
 	else:
 		print "No master node detected!"
 		sys.exit()
 
 	#build and push driver image
-	appName = "{}/{}".format(dockerUser,dockerName)
-	os.system("docker build -t {} .".format(appName))
+	appName = "{}/{}".format(dockerUsername,dockerName)
+	os.system("docker build -t {}:latest .".format(appName))
 	os.system("docker push {}".format(appName))
 	return appName
 
