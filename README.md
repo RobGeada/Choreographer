@@ -53,7 +53,7 @@ The aim of this project was to create an "easy button" interface for the deploym
 	    -n,  --newCluster: Create new cluster, rather than use existing one.
 	    -h,        --help: Print this help
 ```
-So to deploy the example SpotifyTraverse application included with this repo, use the following command:
+So to deploy the example [SpotifyTraverse](https://github.com/RobGeada/Choreographer-Demos/tree/master/SpotifyTraverse/app) demo application, clone the app, navigate to the SpotifyTraverse directory, and use the following command:
 
 `choreograph -w 10 -l SpotifyTraverse.py -o developer:developer`
 
