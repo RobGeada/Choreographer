@@ -55,6 +55,6 @@ The aim of this project was to create an "easy button" interface for the deploym
 ```
 So to deploy the example [SpotifyTraverse](https://github.com/RobGeada/Choreographer-Demos/tree/master/SpotifyTraverse/app) demo application, clone the app, navigate to the SpotifyTraverse directory, and use the following command:
 
-`choreograph -w 10 -l SpotifyTraverse.py -o developer:developer`
+`choreograph -w 10 -l SpotifyTraverse.py -c developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
