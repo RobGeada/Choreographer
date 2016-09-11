@@ -32,13 +32,13 @@ time.sleep(500)
 ```
 This will extract the previous 1000 lines of log output and write them to your local disk. Additionally, I recommend including a sleep counter after the desired input; this ensures that your driver pod will remain running for a bit after output generation, thus ensuring that Choreographer has time to grab the results. 
 
-For further reference, the [SpotifyTraverse.py](https://github.com/RobGeada/OpenShift-Deploy/blob/master/projectFolder/SpotifyTraverse.py) code has all of the specifications above.
-
 ###Setup
 1. Ensure your Spark app meets the configuration guidelines as specified above.
 2. Create a project directory for your Spark application. 
 3. Create a directory named "app" within the project directory. This should contain your app code and all necessary datasets.
 3. Edit the prereqs file within the app folder as neccesary. The file contains instructions on how to properly format your prereq list.
+
+For further reference, the apps in the [Choreographer-Demos](https://github.com/RobGeada/Choreographer-Demos) repo meet all of the setup and configuration guidelines described above.
 
 ###Dockerfile Generation
 Choreographer will generate Dockerfiles for the worker, master, and driver nodes as per your program's specifications. These generated Dockerfiles are based off of RAD Analytics' [openshift-spark](https://github.com/radanalyticsio/openshift-spark) repo.
@@ -53,8 +53,8 @@ The aim of this project was to create an "easy button" interface for the deploym
 	    -n,  --newCluster: Create new cluster, rather than use existing one.
 	    -h,        --help: Print this help
 ```
-So to deploy the example SpotifyTraverse application included with this repo, use the following command:
+So to deploy the example [SpotifyTraverse](https://github.com/RobGeada/Choreographer-Demos/tree/master/SpotifyTraverse/app) demo application, clone the app, navigate to the SpotifyTraverse directory, and use the following command:
 
-`choreograph -w 10 -l SpotifyTraverse.py -o developer:developer`
+`choreograph -w 10 -l SpotifyTraverse.py -c developer:developer`
 
 It's important to remember that Choreographer creates clusters custom built for your application, so use --newCluster in any situation where any part of your project (except for the driver program) has changed.
