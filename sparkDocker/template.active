@@ -9,9 +9,9 @@
             "metadata": {
                 "labels": {
                     "app": "sparkcluster",
-                    "name": "spark-master-4ort"
+                    "name": "spark-master-ocpj"
                 },
-                "name": "spark-master-4ort"
+                "name": "spark-master-ocpj"
             },
             "spec": {
                 "ports": [
@@ -22,7 +22,7 @@
                     }
                 ],
                 "selector": {
-                    "name": "spark-master-4ort"
+                    "name": "spark-master-ocpj"
                 }
             }
         },
@@ -32,9 +32,9 @@
             "metadata": {
                 "labels": {
                     "app": "sparkcluster",
-                    "name": "spark-master-4ort"
+                    "name": "spark-master-ocpj"
                 },
-                "name": "spark-master-4ort-webui"
+                "name": "spark-master-ocpj-webui"
             },
             "spec": {
                 "ports": [
@@ -45,7 +45,7 @@
                     }
                 ],
                 "selector": {
-                    "name": "spark-master-4ort"
+                    "name": "spark-master-ocpj"
                 }
             }
         },
@@ -56,12 +56,12 @@
                 "labels": {
                     "app": "sparkcluster"
                 },
-                "name": "spark-master-4ort"
+                "name": "spark-master-ocpj"
             },
             "spec": {
                 "replicas": 1,
                 "selector": {
-                    "name": "spark-master-4ort"
+                    "name": "spark-master-ocpj"
                 },
                 "strategy": {
                     "rollingParams": {
@@ -72,7 +72,7 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "spark-master-4ort"
+                            "name": "spark-master-ocpj"
                         }
                     },
                     "spec": {
@@ -88,8 +88,8 @@
                                         "value": "8080"
                                     }
                                 ],
-                                "image": "rgeada/openshift-spark-spotifytraverse",
-                                "name": "spark-master-4ort",
+                                "image": "rgeada/openshift-spark-picalc",
+                                "name": "spark-master-ocpj",
                                 "ports": [
                                     {
                                         "containerPort": 7077,
@@ -118,12 +118,12 @@
                 "labels": {
                     "app": "sparkcluster"
                 },
-                "name": "spark-worker-31d4"
+                "name": "spark-worker-byot"
             },
             "spec": {
                 "replicas": 3,
                 "selector": {
-                    "name": "spark-worker-31d4"
+                    "name": "spark-worker-byot"
                 },
                 "strategy": {
                     "rollingParams": {
@@ -134,7 +134,7 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "spark-worker-31d4"
+                            "name": "spark-worker-byot"
                         }
                     },
                     "spec": {
@@ -143,11 +143,11 @@
                                 "env": [
                                     {
                                         "name": "SPARK_MASTER_ADDRESS",
-                                        "value": "spark://spark-master-4ort:7077"
+                                        "value": "spark://spark-master-ocpj:7077"
                                     }
                                 ],
-                                "image": "rgeada/openshift-spark-spotifytraverse",
-                                "name": "spark-worker-31d4"
+                                "image": "rgeada/openshift-spark-picalc",
+                                "name": "spark-worker-byot"
                             }
                         ]
                     }
