@@ -17,6 +17,7 @@ cd Choreographer
 chmod +x choreograph 
 export PATH=$PATH:$(pwd)
 ```
+Make sure to add Choreographer to your path in your bash profile to ensure it remains available upon future logins.
 
 ###Program Configuration
 In order for the OpenShift nodes to properly communicate with your PySpark app, a few parameters must be properly set inside your app code.
