@@ -22,9 +22,9 @@ RUN yum install -y epel-release tar java && \
     yum clean all
 
 RUN cd /opt && \
-    curl https://dist.apache.org/repos/dist/release/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.7.tgz | \
+    curl https://dist.apache.org/repos/dist/release/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz | \
         tar -zx && \
-    ln -s spark-2.0.0-bin-hadoop2.7 spark
+    ln -s spark-2.1.0-bin-hadoop2.7.tgz spark
 RUN yum install -y nss_wrapper """
 
 yumPackages = []
