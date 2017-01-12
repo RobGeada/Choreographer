@@ -22,9 +22,9 @@ MAINTAINER Rob Geada
 
 RUN yum install -y epel-release tar java && \
     cd /opt && \
-    curl https://dist.apache.org/repos/dist/release/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.7.tgz | \
+    curl https://dist.apache.org/repos/dist/release/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz | \
     tar -zx && \
-    ln -s spark-2.0.0-bin-hadoop2.7 spark && \
+    ln -s spark-2.1.0-bin-hadoop2.7.tgz spark && \
     yum install -y nss_wrapper python python-pip """
 
 	yumPackages = []
@@ -49,7 +49,7 @@ r"""&& yum clean all
 ENV PATH=$PATH:/opt/spark/bin \
  	SPARK_HOME=/opt/spark \
  	PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH \
-    PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.1-src.zip:$PYTHONPATH
+    PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.4-src.zip:$PYTHONPATH
 
 # Add scripts used to configure the image
 COPY scripts /tmp/scripts
